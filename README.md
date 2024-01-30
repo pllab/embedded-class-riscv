@@ -11,7 +11,7 @@
     - Not particularly fancy, more syntactic, but turning nested MUX's into
       something more readable.
 
-Note: All of the std lib components are "resued" and can be parameterized in
+Note: All of the std lib components are "reused" and can be parameterized in
 some way, it's just that some of them don't have loops/recursion.
 
 ## Standard Library Functions
