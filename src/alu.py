@@ -182,3 +182,127 @@ def alu_zbkb(op, in1, in2):
     )
 
     return out
+
+def alu_decomp_full(op, in1, in2, bw):
+    """The ALU logic for the RV processor
+
+    :param alu_op: the operation the ALU should perform
+    :param alu_in1: the first input
+    :param alu_in2: the second input
+
+    :return: the result of the computation
+    """
+    op = add_wire(op, bitwidth=5, name="alu_op")
+    in1 = add_wire(in1, bitwidth=bw, name="alu_in1")
+    in2 = add_wire(in2, bitwidth=bw, name="alu_in2")
+
+    from math import log2
+    shift_index = int(log2(bw))
+
+    out = pyrtl.WireVector(bitwidth=bw, name="alu_out")
+    out <<= pyrtl.enum_mux(
+        op,
+        {
+            ALUOp.ADD: in1 + in2,
+            ALUOp.SUB: in1 - in2,
+            ALUOp.SLL: pyrtl.shift_left_logical(in1, in2[0:shift_index]),
+            ALUOp.SLT: pyrtl.signed_lt(in1, in2),
+            ALUOp.SLTU: in1 < in2,
+            ALUOp.XOR: in1 ^ in2,
+            ALUOp.SRL: pyrtl.shift_right_logical(in1, in2[0:shift_index]),
+            ALUOp.SRA: pyrtl.shift_right_arithmetic(in1, in2[0:shift_index]),
+            ALUOp.OR: in1 | in2,
+            ALUOp.AND: in1 & in2,
+            ALUOp.IMM: in2,
+            ALUOp.ROR: rotater(in1, in2[0:5]) if bw == 32 else 0,
+            ALUOp.ROL: rotatel(in1, in2[0:5]) if bw == 32 else 0,
+            ALUOp.ANDN: in1 & ~(in2), # add control sig to invert ALU input
+            ALUOp.ORN: in1 | ~(in2),  # and reuse existing AND or OR
+            ALUOp.XNOR: ~(in1 ^ in2),
+            ALUOp.PACK: pyrtl.concat(in2[0:16], in1[0:16]) if bw == 32 else 0,
+            ALUOp.PACKH: pyrtl.concat(in2[0:8], in1[0:8]).zero_extended(32) if bw == 32 else 0,
+            ALUOp.ZIP: zip32(in1) if bw == 32 else 0,
+            ALUOp.UNZIP: unzip32(in1) if bw == 32 else 0,
+            ALUOp.REV8: rev8(in1) if bw == 32 else 0,
+            ALUOp.REVB: revb(in1) if bw == 32 else 0,
+            ALUOp.CZ: count_zeroes_from_end(in1, in2[0]),
+            ALUOp.CPOP: count_ones(in1),
+            ALUOp.CLMUL: clmul(in1, in2),
+            ALUOp.CLMULH: clmulh(in1, in2),
+        },
+        default=0,
+    )
+
+    return out
+
+def alu_decomp_small(op, in1, in2):
+    """The ALU logic for the RV processor
+
+    :param alu_op: the operation the ALU should perform
+    :param alu_in1: the first input
+    :param alu_in2: the second input
+
+    :return: the result of the computation
+    """
+    op = add_wire(op, bitwidth=5, name="alu_op")
+    in1 = add_wire(in1, bitwidth=8, name="alu_in1")
+    in2 = add_wire(in2, bitwidth=8, name="alu_in2")
+
+    out = pyrtl.WireVector(bitwidth=8, name="alu_out")
+    out <<= pyrtl.enum_mux(
+        op,
+        {
+            ALUOp.ADD: in1 + in2,
+            ALUOp.SUB: in1 - in2,
+            ALUOp.SLL: pyrtl.shift_left_logical(in1, in2[0:3]),
+            ALUOp.SLT: pyrtl.signed_lt(in1, in2),
+            ALUOp.SLTU: in1 < in2,
+            ALUOp.XOR: in1 ^ in2,
+            ALUOp.SRL: pyrtl.shift_right_logical(in1, in2[0:3]),
+            ALUOp.SRA: pyrtl.shift_right_arithmetic(in1, in2[0:3]),
+            ALUOp.OR: in1 | in2,
+            ALUOp.AND: in1 & in2,
+        },
+        default=0,
+    )
+
+    return out
+
+def alu_decomp_small_multicycle(op, in1, in2, valid):
+
+    op = add_wire(op, bitwidth=5, name="alu_op")
+    in1 = add_wire(in1, bitwidth=8, name="alu_in1")
+    in2 = add_wire(in2, bitwidth=8, name="alu_in2")
+
+    out = pyrtl.WireVector(bitwidth=8, name="alu_out")
+    ready = pyrtl.WireVector(bitwidth=1, name="alu_ready")
+    with pyrtl.conditional_assignment:
+        with op == ALUOp.ADD:
+            out |= in1 + in2
+        with op == ALUOp.SUB:
+            out |= in1 - in2
+        with op == ALUOp.SLTU:
+            out |= in1 < in2
+        with op == ALUOp.XOR:
+            out |= in1 ^ in2
+        with op == ALUOp.MULT
+            out |= rtllib.multipliers.simple_mult(in1, in2, valid)
+    # out <<= pyrtl.enum_mux(
+    #     op,
+    #     {
+    #         ALUOp.ADD: in1 + in2,
+    #         ALUOp.SUB: in1 - in2,
+    #         ALUOp.SLL: pyrtl.shift_left_logical(in1, in2[0:3]),
+    #         ALUOp.SLT: pyrtl.signed_lt(in1, in2),
+    #         ALUOp.SLTU: in1 < in2,
+    #         ALUOp.XOR: in1 ^ in2,
+    #         ALUOp.SRL: pyrtl.shift_right_logical(in1, in2[0:3]),
+    #         ALUOp.SRA: pyrtl.shift_right_arithmetic(in1, in2[0:3]),
+    #         ALUOp.OR: in1 | in2,
+    #         ALUOp.AND: in1 & in2,
+    #         ALUOp.MULT: rtllib.multipliers.simple_mult(in1, in2, valid)
+    #     },
+    #     default=0,
+    # )
+
+    return out

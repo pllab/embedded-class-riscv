@@ -41,8 +41,9 @@ class ALUOp(IntEnum):
     ORN = 0x1A
     CLMUL = 0x1B
     CLMULH = 0x1C
-    #CZ = 0x17
-    #CPOP = 0x18
+    CZ = 0x17
+    CPOP = 0x18
+    MULT = 0x19
 
 class MaskMode(IntEnum):
     BYTE = 0x0
