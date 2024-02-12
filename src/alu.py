@@ -183,7 +183,7 @@ def alu_zbkb(op, in1, in2):
 
     return out
 
-def alu_decomp_full(op, in1, in2, bw):
+def alu_decomp_large(op, in1, in2, bw):
     """The ALU logic for the RV processor
 
     :param alu_op: the operation the ALU should perform
@@ -268,41 +268,41 @@ def alu_decomp_small(op, in1, in2):
 
     return out
 
-def alu_decomp_small_multicycle(op, in1, in2, valid):
-
-    op = add_wire(op, bitwidth=5, name="alu_op")
-    in1 = add_wire(in1, bitwidth=8, name="alu_in1")
-    in2 = add_wire(in2, bitwidth=8, name="alu_in2")
-
-    out = pyrtl.WireVector(bitwidth=8, name="alu_out")
-    ready = pyrtl.WireVector(bitwidth=1, name="alu_ready")
-    with pyrtl.conditional_assignment:
-        with op == ALUOp.ADD:
-            out |= in1 + in2
-        with op == ALUOp.SUB:
-            out |= in1 - in2
-        with op == ALUOp.SLTU:
-            out |= in1 < in2
-        with op == ALUOp.XOR:
-            out |= in1 ^ in2
-        with op == ALUOp.MULT
-            out |= rtllib.multipliers.simple_mult(in1, in2, valid)
-    # out <<= pyrtl.enum_mux(
-    #     op,
-    #     {
-    #         ALUOp.ADD: in1 + in2,
-    #         ALUOp.SUB: in1 - in2,
-    #         ALUOp.SLL: pyrtl.shift_left_logical(in1, in2[0:3]),
-    #         ALUOp.SLT: pyrtl.signed_lt(in1, in2),
-    #         ALUOp.SLTU: in1 < in2,
-    #         ALUOp.XOR: in1 ^ in2,
-    #         ALUOp.SRL: pyrtl.shift_right_logical(in1, in2[0:3]),
-    #         ALUOp.SRA: pyrtl.shift_right_arithmetic(in1, in2[0:3]),
-    #         ALUOp.OR: in1 | in2,
-    #         ALUOp.AND: in1 & in2,
-    #         ALUOp.MULT: rtllib.multipliers.simple_mult(in1, in2, valid)
-    #     },
-    #     default=0,
-    # )
-
-    return out
+# def alu_decomp_small_multicycle(op, in1, in2, valid):
+#
+#     op = add_wire(op, bitwidth=5, name="alu_op")
+#     in1 = add_wire(in1, bitwidth=8, name="alu_in1")
+#     in2 = add_wire(in2, bitwidth=8, name="alu_in2")
+#
+#     out = pyrtl.WireVector(bitwidth=8, name="alu_out")
+#     ready = pyrtl.WireVector(bitwidth=1, name="alu_ready")
+#     with pyrtl.conditional_assignment:
+#         with op == ALUOp.ADD:
+#             out |= in1 + in2
+#         with op == ALUOp.SUB:
+#             out |= in1 - in2
+#         with op == ALUOp.SLTU:
+#             out |= in1 < in2
+#         with op == ALUOp.XOR:
+#             out |= in1 ^ in2
+#         with op == ALUOp.MULT
+#             out |= rtllib.multipliers.simple_mult(in1, in2, valid)
+#     # out <<= pyrtl.enum_mux(
+#     #     op,
+#     #     {
+#     #         ALUOp.ADD: in1 + in2,
+#     #         ALUOp.SUB: in1 - in2,
+#     #         ALUOp.SLL: pyrtl.shift_left_logical(in1, in2[0:3]),
+#     #         ALUOp.SLT: pyrtl.signed_lt(in1, in2),
+#     #         ALUOp.SLTU: in1 < in2,
+#     #         ALUOp.XOR: in1 ^ in2,
+#     #         ALUOp.SRL: pyrtl.shift_right_logical(in1, in2[0:3]),
+#     #         ALUOp.SRA: pyrtl.shift_right_arithmetic(in1, in2[0:3]),
+#     #         ALUOp.OR: in1 | in2,
+#     #         ALUOp.AND: in1 & in2,
+#     #         ALUOp.MULT: rtllib.multipliers.simple_mult(in1, in2, valid)
+#     #     },
+#     #     default=0,
+#     # )
+#
+#     return out
