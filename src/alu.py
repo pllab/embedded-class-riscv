@@ -225,7 +225,7 @@ def alu_decomp_large(op, in1, in2, bw):
             ALUOp.UNZIP: unzip32(in1) if bw == 32 else 0,
             ALUOp.REV8: rev8(in1) if bw == 32 else 0,
             ALUOp.REVB: revb(in1) if bw == 32 else 0,
-            ALUOp.CZ: count_zeroes_from_end(in1, in2[0]),
+            # ALUOp.CZ: count_zeroes_from_end(in1, in2[0]),
             ALUOp.CPOP: count_ones(in1),
             ALUOp.CLMUL: clmul(in1, in2),
             ALUOp.CLMULH: clmulh(in1, in2),
