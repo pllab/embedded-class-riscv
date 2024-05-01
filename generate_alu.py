@@ -3,9 +3,9 @@ from .src import alu_decomp_small, alu_decomp_large
 
 def alu_small_builder():
     op = pyrtl.Input(bitwidth=5, name="op")
-    in1 = pyrtl.Input(bitwidth=bwidth, name="in1")
-    in2 = pyrtl.Input(bitwidth=bwidth, name="in2")
-    out = pyrtl.Output(bitwidth=bwidth, name="out")
+    in1 = pyrtl.Input(bitwidth=8, name="in1")
+    in2 = pyrtl.Input(bitwidth=8, name="in2")
+    out = pyrtl.Output(bitwidth=8, name="out")
     alu_out = alu_decomp_small(op, in1, in2)
     out <<= alu_out
 
