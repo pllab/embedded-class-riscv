@@ -1,5 +1,13 @@
 import pyrtl, sys, io
-from src import alu_decomp_small, alu_decomp_large
+from .src import alu_decomp_small, alu_decomp_large
+
+def alu_small_builder():
+    op = pyrtl.Input(bitwidth=5, name="op")
+    in1 = pyrtl.Input(bitwidth=bwidth, name="in1")
+    in2 = pyrtl.Input(bitwidth=bwidth, name="in2")
+    out = pyrtl.Output(bitwidth=bwidth, name="out")
+    alu_out = alu_decomp_small(op, in1, in2)
+    out <<= alu_out
 
 if __name__ == "__main__":
     from argparse import ArgumentParser, BooleanOptionalAction
