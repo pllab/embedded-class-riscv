@@ -60,13 +60,12 @@ if __name__ == "__main__":
     if args.synth:
         pyrtl.synthesize()
     if args.opt:
-        pyrtl.optimize()
-
-    pyrtl.passes._remove_wire_nets(pyrtl.working_block())
-    # pyrtl.passes._remove_slice_nets(pyrtl.working_block())
-    pyrtl.passes.constant_propagation(pyrtl.working_block(), True)
-    # pyrtl.passes._remove_unlistened_nets(pyrtl.working_block())
-    # pyrtl.passes.common_subexp_elimination(pyrtl.working_block())
+        # pyrtl.optimize()
+        pyrtl.passes._remove_wire_nets(pyrtl.working_block())
+        # pyrtl.passes._remove_slice_nets(pyrtl.working_block())
+        pyrtl.passes.constant_propagation(pyrtl.working_block(), True)
+        # pyrtl.passes._remove_unlistened_nets(pyrtl.working_block())
+        # pyrtl.passes.common_subexp_elimination(pyrtl.working_block())
 
     if alu_output == 'o':
         import generate_ir
